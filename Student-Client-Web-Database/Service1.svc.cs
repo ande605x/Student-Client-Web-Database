@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
@@ -15,9 +16,20 @@ namespace Student_Client_Web_Database
     public class Service1 : IService1
     {
 
-        string conn =
+        string connectionString =
             "Server = tcp:andersstandardserver2017.database.windows.net,1433; Initial Catalog = andersstandarddatabase2017; Persist Security Info = False; User ID = andersstandardserver2017; Password =Pass1234; MultipleActiveResultSets = False; Encrypt = True; TrustServerCertificate = False; Connection Timeout = 30;";
 
+
+
+
+        private static string GetConnectionStringFromAppConfig()
+        {
+            // https://msdn.microsoft.com/en-us/library/ms254494.aspx
+            ConnectionStringSettingsCollection connectionStringSettingsCollection = ConfigurationManager.ConnectionStrings;
+            ConnectionStringSettings connStringSettings = connectionStringSettingsCollection["ande605xdatabaseAzure"];
+            string connString = connStringSettings.ConnectionString;
+            return connString;
+        }
 
 
 
@@ -25,6 +37,8 @@ namespace Student_Client_Web_Database
 
         private static Student ReadStudent(IDataRecord reader)
         {
+            string conn = GetConnectionStringFromAppConfig();
+
             int tempId = reader.GetInt32(0);
             string tempNavn = reader.GetString(1);
             string tempKlasse = reader.GetString(2);
@@ -40,6 +54,8 @@ namespace Student_Client_Web_Database
 
         public IList<Student> GetAllStudents()
         {
+            string conn = GetConnectionStringFromAppConfig();
+
             string selectAllStudents = "select * from students";
 
             using (SqlConnection databaseConnection = new SqlConnection(conn))
@@ -67,6 +83,8 @@ namespace Student_Client_Web_Database
 
         public Student GetStudentByID(int studID)
         {
+            string conn = GetConnectionStringFromAppConfig();
+
             const string selectStudent = "select * from students where ID=@studIDtemp";
             using (SqlConnection databaseConnection = new SqlConnection(conn))
             {
@@ -91,6 +109,8 @@ namespace Student_Client_Web_Database
 
         public IList<Student> GetStudentsByName(string name)
         {
+            string conn = GetConnectionStringFromAppConfig();
+
             string selectStr = "select * from students where Navn LIKE @name";
             using (SqlConnection databaseConnection = new SqlConnection(conn))
             {
@@ -118,6 +138,8 @@ namespace Student_Client_Web_Database
 
         public void AddStudent(int id, string navn, string klasse)
         {
+            string conn = GetConnectionStringFromAppConfig();
+
             const string insertStudent = "insert into students values (@id, @navn, @klasse)";
             using (SqlConnection databaseConnection = new SqlConnection(conn))
             {
